@@ -69,14 +69,12 @@
             //setTimeout(location.reload.bind(location), 2000);
         }
 
-        var conn = new signalR.HttpConnection(`http://${document.location.host}/race`);
+        var conn = new signalR.HttpConnection(`http://${document.location.host}/race`, { transport: signalR.TransportType.LongPolling } );
         var hub = new signalR.HubConnection(conn, { protocol: new signalRMsgPack.MessagePackHubProtocol() });
 
         hub.on('updatePositions', data => {
             draw(data);
         });
-
-        //hub.on('startingRace')
 
         hub.start().then(() => {
             console.log("SignalR Started!");
