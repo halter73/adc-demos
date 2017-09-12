@@ -76,8 +76,16 @@
             draw(data);
         });
 
+        hub.on('onMessage', message => {
+            console.log(message);
+        });
+
         hub.start().then(() => {
-            console.log("SignalR Started!");
+            console.log('SignalR Started!');
+
+            hub.invoke('SendMessage', 'Connected!').then(id => {
+                console.log(`My connection id: ${id}`)
+            });
         }).catch(err => {
             console.error(err);
         });
