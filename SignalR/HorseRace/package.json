@@ -1,0 +1,7 @@
+{
+  "name": "SignalRDemo",
+  "version": "1.0.0",
+  "dependencies": {
+    "@aspnet/signalr-client": "^1.0.0-alpha1"
+  }
+}
