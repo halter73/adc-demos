@@ -21,6 +21,9 @@ namespace HorseRace
         {
             services.AddMvc();
             services.AddSingleton<HorseRacer>();
+
+            services.AddSockets();
+            services.AddEndPoint<RawEndPoint>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -28,14 +31,20 @@ namespace HorseRace
             IApplicationBuilder app,
             IHostingEnvironment env,
             IApplicationLifetime applicationLifetime,
-            HorseRacer horseRacer)
+            HorseRacer horseRacer,
+            RawEndPoint rawEndPoint)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            _ = StartRaces(horseRacer, applicationLifetime);
+            app.UseSockets(routes =>
+            {
+                routes.MapEndPoint<RawEndPoint>("raw");
+            });
+
+            _ = StartRaces(horseRacer, rawEndPoint, applicationLifetime);
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
@@ -43,11 +52,14 @@ namespace HorseRace
             app.UseMvc();
         }
 
-        private async Task StartRaces(HorseRacer horseRaceService, IApplicationLifetime applicationLifetime)
+        private async Task StartRaces(HorseRacer horseRaceService, RawEndPoint rawEndPoint, IApplicationLifetime applicationLifetime)
         {
             try
             {
-                await horseRaceService.RunRaces(applicationLifetime.ApplicationStopping);
+                await Task.WhenAll(
+                    horseRaceService.RunRaces(applicationLifetime.ApplicationStopping),
+                    rawEndPoint.BroadcastPositionsAsync());
+
             }
             catch (Exception ex)
             {

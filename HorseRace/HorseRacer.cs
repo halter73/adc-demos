@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Channels;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -27,6 +28,7 @@ namespace HorseRace
 
         private Horse[] _stablePositions;
         private Horse[] _positions = new Horse[0];
+        private readonly Channel<Horse[]> _positionChannel = Channel.CreateBounded<Horse[]>(bufferedCapacity: 1, mode: BoundedChannelFullMode.DropOldest);
 
         public HorseRacer(IEnumerable<IHorseRaceHandler> horseRaceHandlers, ILoggerFactory loggerFactory)
         {
@@ -35,6 +37,7 @@ namespace HorseRace
         }
 
         public Horse[] CurrentPositions => _positions;
+        public ReadableChannel<Horse[]> PositionReadableChannel => _positionChannel.In;
 
         public async Task RunRaces(CancellationToken cancellationToken)
         {
@@ -55,6 +58,7 @@ namespace HorseRace
                 }).ToArray();
 
                 _logger.LogWarning("Starting race with {entrants}. {Time} left to start.", string.Join(", ", entrants), _racePaddingTime);
+                _positionChannel.Out.TryWrite(_positions);
                 foreach (var handler in _horseRaceHandlers)
                 {
                     handler.UpdatePositions(_positions);
@@ -90,6 +94,7 @@ namespace HorseRace
 
                     _positions = _stablePositions.OrderBy(horse => horse.Id).ToArray();
 
+                    _positionChannel.Out.TryWrite(_positions);
                     foreach (var handler in _horseRaceHandlers)
                     {
                         handler.UpdatePositions(_positions);
