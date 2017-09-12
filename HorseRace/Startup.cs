@@ -35,7 +35,8 @@ namespace HorseRace
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver()
                 };
-            });
+            })
+            .AddRedis();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,7 +75,9 @@ namespace HorseRace
             try
             {
                 await Task.WhenAll(
-                    horseRaceService.RunRaces(applicationLifetime.ApplicationStopping),
+                Configuration["read-only"] != "true" ?
+                    horseRaceService.RunRaces(applicationLifetime.ApplicationStopping) :
+                    Task.CompletedTask,
                     rawEndPoint.BroadcastPositionsAsync());
 
             }

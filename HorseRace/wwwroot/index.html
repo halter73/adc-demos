@@ -70,7 +70,7 @@
         }
 
         var conn = new signalR.HttpConnection(`http://${document.location.host}/race`, { transport: signalR.TransportType.LongPolling } );
-        var hub = new signalR.HubConnection(conn, { protocol: new signalRMsgPack.MessagePackHubProtocol() });
+        var hub = new signalR.HubConnection(conn);
 
         hub.on('updatePositions', data => {
             draw(data);
