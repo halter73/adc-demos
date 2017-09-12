@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Horse Race</title>
+</head>
+<body>
+    <canvas id="canvas" width="900" height="520"></canvas>
+    <script>
+        var canvas = document.getElementById('canvas');
+        var ratio = window.devicePixelRatio || 1;
+        var ctx = canvas.getContext('2d');
+        var img = new Image();
+
+        //ctx.scale(ratio, ratio);
+
+        var drawHorses = (positions) => {
+            positions.forEach(function (pos, i) {
+                ctx.drawImage(img, pos.distance * .67, 20 + 100 * i, 150, 100);
+            });
+        }
+
+        var drawLines = (positions) => {
+            positions.forEach(function (pos, i) {
+                ctx.beginPath();
+                ctx.setLineDash([5, 15]);
+                ctx.moveTo(0, 110 + 100 * i);
+                ctx.lineTo(800, 110 + 100 * i);
+                ctx.stroke();
+            });
+        }
+
+        var drawNames = (positions) => {
+            ctx.font = '20px Arial, Helvetica, sans-serif';
+
+            positions.forEach(function (pos, i) {
+                ctx.fillText(pos.name, 0, 30 + 100 * i);
+            });
+        }
+
+        var drawPlacements = (positions) => {
+            var places = ['1ˢᵗ', '2ⁿᵈ', '3ʳᵈ', '4ᵗʰ', '5ᵗʰ'];
+
+            ctx.font = '40px Arial, Helvetica, sans-serif';
+
+            positions.forEach(function (pos, i) {
+                if (pos.distance == 1000) {
+                    if (pos.position == 1) {
+                        ctx.fillStyle = 'red';
+                    }
+
+                    ctx.fillText(places[pos.position - 1], 800, 75 + 100 * i);
+
+                    ctx.fillStyle = 'black';
+                }
+            });
+        }
+
+        var draw = (data) => {
+            drawHorses(data);
+            drawLines(data);
+            drawNames(data);
+            drawPlacements(data);
+            //setTimeout(location.reload.bind(location), 2000);
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/api/positions', true);
+        xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                var data = JSON.parse(xhr.response || xhr.responseText);
+                img.onload = () => draw(data);
+                img.src = '/galloping-horse.svg';
+            }
+            else {
+                alert('Request to /api/positions failed!');
+            }
+        };
+        xhr.send();
+    </script>
+</body>
+</html>

@@ -4,11 +4,11 @@ namespace HorseRace
 {
     public class HorseRaceHandler : IHorseRaceHandler
     {
-        public void StartingRace(string[] entrants, TimeSpan timeToStart)
+        public void StartingRace(Horse[] entrants, TimeSpan timeToStart)
         {
         }
 
-        public void UpdatePositions(HorsePosition[] horsePositions)
+        public void UpdatePositions(Horse[] horsePositions)
         {
         }
 
@@ -16,7 +16,7 @@ namespace HorseRace
         {
         }
 
-        public void RaceCompleted(TimeSpan timeToNextRace)
+        public void RaceCompleted(Horse[] finalPositions, TimeSpan timeToNextRace)
         {
         }
     }

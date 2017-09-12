@@ -4,9 +4,9 @@ namespace HorseRace
 {
     public interface IHorseRaceHandler
     {
-        void StartingRace(string[] entrants, TimeSpan timeToStart);
-        void UpdatePositions(HorsePosition[] horsePositions);
-        void RaceCompleted(TimeSpan timeToNextRace);
+        void StartingRace(Horse[] entrants, TimeSpan timeToStart);
+        void UpdatePositions(Horse[] horsePositions);
+        void RaceCompleted(Horse[] finalPositions, TimeSpan timeToNextRace);
         void RaceCanceled();
     }
 }

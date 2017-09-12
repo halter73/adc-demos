@@ -13,7 +13,7 @@ namespace HorseRace.Controllers
         }
 
         [HttpGet]
-        public HorsePosition[] Get()
+        public Horse[] Get()
         {
             return _horseRacer.CurrentPositions;
         }
