@@ -30,8 +30,8 @@ namespace HorseRace
                 {
                     if (connection.Transport.In.TryRead(out var buffer))
                     {
-                        // We can avoid the copy here but we'll deal with that later
                         var text = Encoding.UTF8.GetString(buffer);
+                        connection.Metadata["LastSent"] = text;
                         text = $"{connection.ConnectionId}: {text}";
                         await Broadcast(Encoding.UTF8.GetBytes(text));
                     }
