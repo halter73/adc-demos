@@ -6,7 +6,9 @@
 </head>
 <body>
     <canvas id="canvas" width="900" height="520"></canvas>
+
     <script src="/lib/signalr-client/signalr-client.js"></script>
+    <script src="/lib/signalr-client/signalr-msgpackprotocol.js"></script>
     <script>
         var canvas = document.getElementById('canvas');
         var ratio = window.devicePixelRatio || 1;
@@ -68,11 +70,13 @@
         }
 
         var conn = new signalR.HttpConnection(`http://${document.location.host}/race`);
-        var hub = new signalR.HubConnection(conn);
+        var hub = new signalR.HubConnection(conn, { protocol: new signalRMsgPack.MessagePackHubProtocol() });
 
         hub.on('updatePositions', data => {
             draw(data);
         });
+
+        //hub.on('startingRace')
 
         hub.start().then(() => {
             console.log("SignalR Started!");
