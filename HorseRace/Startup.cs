@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
+using HorseRace.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace HorseRace
 {
@@ -21,9 +24,18 @@ namespace HorseRace
         {
             services.AddMvc();
             services.AddSingleton<HorseRacer>();
+            services.AddSingleton<IHorseRaceHandler, HorseRaceHandler>();
 
             services.AddSockets();
             services.AddEndPoint<RawEndPoint>();
+
+            services.AddSignalR(options =>
+            {
+                options.JsonSerializerSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,6 +54,11 @@ namespace HorseRace
             app.UseSockets(routes =>
             {
                 routes.MapEndPoint<RawEndPoint>("raw");
+            });
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<RaceHub>("race");
             });
 
             _ = StartRaces(horseRacer, rawEndPoint, applicationLifetime);
