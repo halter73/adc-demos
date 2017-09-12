@@ -24,8 +24,13 @@ namespace HorseRace
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddSingleton<HorseRacer>();
-            services.AddSingleton<IHostedService>(sp => sp.GetService<HorseRacer>());
+
+            if (Configuration["read-only"] != "true")
+            {
+                services.AddSingleton<HorseRacer>();
+                services.AddSingleton<IHostedService>(sp => sp.GetService<HorseRacer>());
+            }
+
             services.AddSingleton<IHorseRaceHandler, HorseRaceHandler>();
             services.AddSignalR(options =>
             {
@@ -33,15 +38,14 @@ namespace HorseRace
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver()
                 };
-            });
+            })
+            .AddRedis();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
             IApplicationBuilder app,
-            IHostingEnvironment env,
-            IApplicationLifetime applicationLifetime,
-            HorseRacer horseRacer)
+            IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
