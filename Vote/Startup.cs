@@ -25,6 +25,10 @@ namespace SignalRDemos
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseStaticFiles(new StaticFileOptions
+            {
+            });
+
             app.Run(async (context) =>
             {
                 await context.Response.WriteAsync("Hello World!");

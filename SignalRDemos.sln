@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26828.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRDemos", "SignalRDemos\SignalRDemos.csproj", "{89C37B39-06CC-490C-826C-ADE8ACFA50AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vote", "Vote\Vote.csproj", "{89C37B39-06CC-490C-826C-ADE8ACFA50AF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HorseRace", "HorseRace\HorseRace.csproj", "{A65901FA-DB11-413D-98B8-678137D68BC4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{E869EF55-367E-47B4-9547-C88B46042A48}"
+EndProject
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +20,14 @@ Global
 		{89C37B39-06CC-490C-826C-ADE8ACFA50AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89C37B39-06CC-490C-826C-ADE8ACFA50AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89C37B39-06CC-490C-826C-ADE8ACFA50AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A65901FA-DB11-413D-98B8-678137D68BC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A65901FA-DB11-413D-98B8-678137D68BC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A65901FA-DB11-413D-98B8-678137D68BC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A65901FA-DB11-413D-98B8-678137D68BC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E869EF55-367E-47B4-9547-C88B46042A48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E869EF55-367E-47B4-9547-C88B46042A48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E869EF55-367E-47B4-9547-C88B46042A48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E869EF55-367E-47B4-9547-C88B46042A48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
