@@ -24,7 +24,9 @@ namespace HorseRace
 
         private readonly IEnumerable<IHorseRaceHandler> _horseRaceHandlers;
         private readonly ILogger _logger;
-        private HorsePosition[] _positions = new HorsePosition[0];
+
+        private Horse[] _stablePositions;
+        private Horse[] _positions = new Horse[0];
 
         public HorseRacer(IEnumerable<IHorseRaceHandler> horseRaceHandlers, ILoggerFactory loggerFactory)
         {
@@ -32,7 +34,7 @@ namespace HorseRace
             _logger = loggerFactory.CreateLogger<HorseRacer>();
         }
 
-        public HorsePosition[] CurrentPositions => _positions;
+        public Horse[] CurrentPositions => _positions;
 
         public async Task RunRaces(CancellationToken cancellationToken)
         {
@@ -41,12 +43,13 @@ namespace HorseRace
             while (!cancellationToken.IsCancellationRequested)
             {
                 var entrants = _fullNames.Take(_fieldSize).ToArray();
-                _positions = _positionNumbers.Zip(entrants, (startingPos, name) =>
+                _stablePositions = _positions = _positionNumbers.Zip(entrants, (startingPos, name) =>
                 {
-                    return new HorsePosition
+                    return new Horse
                     {
-                        Position = startingPos,
+                        Id = startingPos,
                         Name = name,
+                        Position = startingPos,
                         Distance = 0,
                     };
                 }).ToArray();
@@ -54,28 +57,38 @@ namespace HorseRace
                 _logger.LogWarning("Starting race with {entrants}. {Time} left to start.", string.Join(", ", entrants), _racePaddingTime);
                 foreach (var handler in _horseRaceHandlers)
                 {
-                    handler.StartingRace(entrants, _racePaddingTime);
+                    handler.UpdatePositions(_positions);
+                }
+                foreach (var handler in _horseRaceHandlers)
+                {
+                    handler.StartingRace(_positions, _racePaddingTime);
                 }
 
                 await Task.Delay(_racePaddingTime);
 
-                while (_positions.Any(pos => pos.Distance < _trackLength) && !cancellationToken.IsCancellationRequested)
+                while (_positions.Any(horse => horse.Distance < _trackLength) && !cancellationToken.IsCancellationRequested)
                 {
-                    var updatedDistances = _positions
-                        .Select(pos => (pos.Name, pos.Distance == _trackLength ?
-                                                    _trackLength + _maxSpeed : // Keep position of completed racers stable.
-                                                    pos.Distance + random.Next(_minSpeed, _maxSpeed)))
-                        .OrderByDescending(tuple => tuple.Item2);
+                    var updatedDistances = _stablePositions
+                        .Select(horse => (
+                            horse.Id,
+                            horse.Name,
+                            horse.Distance == _trackLength ?
+                                _trackLength + _maxSpeed : // Keep position of completed racers stable.
+                                horse.Distance + random.Next(_minSpeed, _maxSpeed)))
+                        .OrderByDescending(tuple => tuple.Item3);
 
-                    _positions = _positionNumbers.Zip(updatedDistances, (pos, distanceTuple) =>
+                    _stablePositions = _positionNumbers.Zip(updatedDistances, (pos, distanceTuple) =>
                     {
-                        return new HorsePosition
+                        return new Horse
                         {
+                            Id = distanceTuple.Item1,
+                            Name = distanceTuple.Item2,
                             Position = pos,
-                            Name = distanceTuple.Item1,
-                            Distance = Math.Min(distanceTuple.Item2, _trackLength),
+                            Distance = Math.Min(distanceTuple.Item3, _trackLength),
                         };
                     }).ToArray();
+
+                    _positions = _stablePositions.OrderBy(horse => horse.Id).ToArray();
 
                     foreach (var handler in _horseRaceHandlers)
                     {
@@ -98,7 +111,7 @@ namespace HorseRace
                 _logger.LogWarning("Race completed! {entrant} is the winner!", _positions[0].Name);
                 foreach (var handler in _horseRaceHandlers)
                 {
-                    handler.RaceCompleted(_racePaddingTime);
+                    handler.RaceCompleted(_positions, _racePaddingTime);
                 }
 
                 await Task.Delay(_racePaddingTime);
