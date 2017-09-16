@@ -21,6 +21,7 @@ namespace HorseRace
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseConfiguration(new ConfigurationBuilder().AddCommandLine(args).Build())
+                .UseUrls("http://*:5000")
                 .UseStartup<Startup>()
                 .Build();
     }

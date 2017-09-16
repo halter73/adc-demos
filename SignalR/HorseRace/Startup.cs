@@ -40,6 +40,10 @@ namespace HorseRace
                 };
             })
             .AddRedis();
+
+            services.AddSockets();
+            services.AddEndPoint<RawEndPoint>();
+            services.AddSingleton<IHostedService>(sp => sp.GetService<RawEndPoint>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,6 +58,11 @@ namespace HorseRace
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
+
+            app.UseSockets(routes =>
+            {
+                routes.MapEndPoint<RawEndPoint>("raw");
+            });
 
             app.UseSignalR(routeBuilder =>
             {
