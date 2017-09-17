@@ -21,8 +21,8 @@ namespace BasicWeb.Controllers
         public static bool IsPrime(long number)
         {
             lock (_primeLock)
-	    {
-	        //Console.WriteLine("Finding prime of '{0}'.", number);
+            {
+                //Console.WriteLine("Finding prime of '{0}'.", number);
                 if (number == 1) return false;
                 if (number == 2) return true;
                 if (number % 2 == 0)  return false;
@@ -35,7 +35,7 @@ namespace BasicWeb.Controllers
                 }
             
                 return true;        
-	    }
+            }
         }
     }
 }
