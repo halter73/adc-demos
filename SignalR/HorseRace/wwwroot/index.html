@@ -8,17 +8,18 @@
     <canvas id="canvas" width="900" height="520"></canvas>
     <script>
         var canvas = document.getElementById('canvas');
-        var ratio = window.devicePixelRatio || 1;
         var ctx = canvas.getContext('2d');
         var img = new Image();
+        img.src = '/galloping-horse.svg';
 
+        //var ratio = window.devicePixelRatio || 1;
         //ctx.scale(ratio, ratio);
 
         var drawHorses = (positions) => {
             positions.forEach(function (pos, i) {
                 ctx.drawImage(img, pos.distance * .67, 20 + 100 * i, 150, 100);
             });
-        }
+        };
 
         var drawLines = (positions) => {
             positions.forEach(function (pos, i) {
@@ -28,7 +29,7 @@
                 ctx.lineTo(800, 110 + 100 * i);
                 ctx.stroke();
             });
-        }
+        };
 
         var drawNames = (positions) => {
             ctx.font = '20px Arial, Helvetica, sans-serif';
@@ -36,7 +37,7 @@
             positions.forEach(function (pos, i) {
                 ctx.fillText(pos.name, 0, 30 + 100 * i);
             });
-        }
+        };
 
         var drawPlacements = (positions) => {
             var places = ['1ˢᵗ', '2ⁿᵈ', '3ʳᵈ', '4ᵗʰ', '5ᵗʰ'];
@@ -54,29 +55,33 @@
                     ctx.fillStyle = 'black';
                 }
             });
-        }
+        };
 
         var draw = (data) => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawHorses(data);
             drawLines(data);
             drawNames(data);
             drawPlacements(data);
-            //setTimeout(location.reload.bind(location), 2000);
-        }
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/api/positions', true);
-        xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                var data = JSON.parse(xhr.response || xhr.responseText);
-                img.onload = () => draw(data);
-                img.src = '/galloping-horse.svg';
-            }
-            else {
-                alert('Request to /api/positions failed!');
-            }
         };
-        xhr.send();
+
+        var pollAjax = () => {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/api/positions', true);
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    var data = JSON.parse(xhr.response || xhr.responseText);
+                    draw(data);
+                    setTimeout(pollAjax, 3000);
+                }
+                else {
+                    alert('Request to /api/positions failed!');
+                }
+            };
+            xhr.send();
+        };
+
+        img.onload = pollAjax;
     </script>
 </body>
 </html>

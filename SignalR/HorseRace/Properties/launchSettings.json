@@ -19,11 +19,11 @@
     "HorseRace": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/positions",
+      "launchUrl": "",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:55982/"
+      "applicationUrl": "http://localhost:5000/"
     }
   }
 }

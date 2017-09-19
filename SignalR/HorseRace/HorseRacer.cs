@@ -21,7 +21,7 @@ namespace HorseRace
         private static readonly IEnumerable<string> _fullNames = GetHorseNames();
         private static readonly int[] _positionNumbers = Enumerable.Range(1, _fieldSize).ToArray();
         private static readonly TimeSpan _racePaddingTime = TimeSpan.FromSeconds(5);
-        private static readonly TimeSpan _tickInterval = TimeSpan.FromSeconds(1);
+        private static readonly TimeSpan _tickInterval = TimeSpan.FromSeconds(.5);
 
         private readonly IEnumerable<IHorseRaceHandler> _horseRaceHandlers;
         private readonly ILogger _logger;
