@@ -6,6 +6,7 @@
 </head>
 <body>
     <canvas id="canvas" width="900" height="520"></canvas>
+    <div id="contestants"></div>
     <script src="lib/signalr-client/signalr-client.js"></script>
     <script>
         var canvas = document.getElementById('canvas');
@@ -71,6 +72,34 @@
 
         hub.on('updatePositions', data => {
             draw(data);
+        });
+
+        hub.on('startingRace', horses => {
+            var contestants = document.getElementById('contestants');
+            contestants.innerHTML = "";
+
+            horses.forEach(horse => {
+                var betLink = document.createElement('a');
+                var horseText = document.createTextNode(horse.name);
+                betLink.appendChild(horseText);
+                betLink.href = '#';
+                betLink.onclick = () => {
+                    hub.invoke('bet', horse.id).then(() => {
+                        alert(`Recorded your bet for ${horse.name}!`);
+                    });
+                };
+
+                contestants.appendChild(betLink);
+                contestants.appendChild(document.createTextNode('\u00A0\u00A0\u00A0\u00A0'));
+            });
+        });
+
+        hub.on('win', () => {
+            alert("Winner! =)");
+        });
+
+        hub.on('lose', () => {
+            alert("Loser! =P");
         });
 
         hub.start().then(() => {

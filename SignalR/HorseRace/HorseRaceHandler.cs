@@ -15,6 +15,7 @@ namespace HorseRace
 
         public void StartingRace(Horse[] entrants, TimeSpan timeToStart)
         {
+            _raceHub.Clients.All.InvokeAsync("StartingRace", new[] { entrants });
         }
 
         public void UpdatePositions(Horse[] horsePositions)
@@ -28,6 +29,17 @@ namespace HorseRace
 
         public void RaceCompleted(Horse[] finalPositions, TimeSpan timeToNextRace)
         {
+            foreach (var horse in finalPositions)
+            {
+                if (horse.Position == 1)
+                {
+                    _raceHub.Clients.Group(horse.Id.ToString()).InvokeAsync("win");
+                }
+                else
+                {
+                    _raceHub.Clients.Group(horse.Id.ToString()).InvokeAsync("lose");
+                }
+            }
         }
     }
 }
