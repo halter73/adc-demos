@@ -6,6 +6,7 @@
 </head>
 <body>
     <canvas id="canvas" width="900" height="520"></canvas>
+    <script src="lib/signalr-client/signalr-client.js"></script>
     <script>
         var canvas = document.getElementById('canvas');
         var ctx = canvas.getContext('2d');
@@ -65,23 +66,18 @@
             drawPlacements(data);
         };
 
-        var pollAjax = () => {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/api/positions', true);
-            xhr.onload = () => {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    var data = JSON.parse(xhr.response || xhr.responseText);
-                    draw(data);
-                    setTimeout(pollAjax, 3000);
-                }
-                else {
-                    alert('Request to /api/positions failed!');
-                }
-            };
-            xhr.send();
-        };
+        var conn = new signalR.HttpConnection(`http://${document.location.host}/race`);
+        var hub = new signalR.HubConnection(conn);
 
-        img.onload = pollAjax;
+        hub.on('updatePositions', data => {
+            draw(data);
+        });
+
+        hub.start().then(() => {
+            console.log("SignalR Started!");
+        }).catch(err => {
+            console.error(err);
+        });
     </script>
 </body>
 </html>
