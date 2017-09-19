@@ -5,10 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Hosting;
 
 namespace HorseRace
 {
-    public class HorseRacer
+    public class HorseRacer : IHostedService
     {
         private const int _fieldSize = 5;
         private const int _trackLength = 1000; // Not starting an argument about units
@@ -25,6 +26,8 @@ namespace HorseRace
         private readonly IEnumerable<IHorseRaceHandler> _horseRaceHandlers;
         private readonly ILogger _logger;
 
+        private Task _runRacesTask;
+
         private Horse[] _stablePositions;
         private Horse[] _positions = new Horse[0];
 
@@ -34,9 +37,20 @@ namespace HorseRace
             _logger = loggerFactory.CreateLogger<HorseRacer>();
         }
 
+        Task IHostedService.StartAsync(CancellationToken cancellationToken)
+        {
+            _runRacesTask = RunRacesWithCrashLogging(cancellationToken);
+            return Task.CompletedTask;
+        }
+
+        Task IHostedService.StopAsync(CancellationToken cancellationToken)
+        {
+            return _runRacesTask;
+        }
+
         public Horse[] CurrentPositions => _positions;
 
-        public async Task RunRaces(CancellationToken cancellationToken)
+        private async Task RunRaces(CancellationToken cancellationToken)
         {
             var random = new Random();
 
@@ -115,6 +129,19 @@ namespace HorseRace
                 }
 
                 await Task.Delay(_racePaddingTime);
+            }
+        }
+
+        private async Task RunRacesWithCrashLogging(CancellationToken cancellationToken)
+        {
+            try
+            {
+                await RunRaces(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical($"{nameof(HorseRacer)} exited unexpectedly: {ex}");
+                throw;
             }
         }
 

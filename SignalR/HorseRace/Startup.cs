@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace HorseRace
 {
@@ -21,6 +22,7 @@ namespace HorseRace
         {
             services.AddMvc();
             services.AddSingleton<HorseRacer>();
+            services.AddSingleton<IHostedService>(sp => sp.GetService<HorseRacer>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,24 +37,10 @@ namespace HorseRace
                 app.UseDeveloperExceptionPage();
             }
 
-            _ = StartRaces(horseRacer, applicationLifetime);
-
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseMvc();
-        }
-
-        private async Task StartRaces(HorseRacer horseRaceService, IApplicationLifetime applicationLifetime)
-        {
-            try
-            {
-                await horseRaceService.RunRaces(applicationLifetime.ApplicationStopping);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"{nameof(HorseRacer)} exited unexpectedly: {ex}");
-            }
         }
     }
 }
